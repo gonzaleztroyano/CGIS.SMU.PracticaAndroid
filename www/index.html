@@ -51,10 +51,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Buscar libros</a>
+                        <a class="nav-link active" aria-current="page" href="./index.html">Buscar libros</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Libros para mi ánimo</a>
+                        <a class="nav-link" href="./mood.html">Libros para mi ánimo</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Libros sugeridos</a>
@@ -65,9 +65,15 @@
     </nav>
 
     <div class="container mt-4">
-        <form class="d-flex" role="search" id="searchForm">
+        <form class="d-flex align-items-center" role="search" id="searchForm">
             <input class="form-control me-2" type="search" placeholder="Buscar libros" aria-label="Search" id="searchInput">
-            <button class="btn btn-outline-success" type="submit">Buscar</button>
+            <button class="btn btn-outline-success me-2" type="submit">Buscar</button>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="spanishOnlyCheckbox">
+                <label class="form-check-label" for="spanishOnlyCheckbox">
+                    Buscar solo en castellano
+                </label>
+            </div>
         </form>
     </div>
 
@@ -88,7 +94,8 @@
     </div>
 
     <!-- Add Bootstrap JavaScript Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-qQ2iX+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script type="module" src="js/index.mjs"></script>
 
     <script>
@@ -96,7 +103,12 @@
             event.preventDefault(); // Prevent form submission
 
             const userInput = document.getElementById('searchInput').value;
-            const apiUrl = `https://openlibrary.org/search.json?title=${encodeURIComponent(userInput)}&limit=10&language=spa`;
+            const spanishOnly = document.getElementById('spanishOnlyCheckbox').checked;
+
+            // Adjust the API URL based on the checkbox
+            const apiUrl = spanishOnly
+                ? `https://openlibrary.org/search.json?title=${encodeURIComponent(userInput)}&limit=10`
+                : `https://openlibrary.org/search.json?title=${encodeURIComponent(userInput)}&limit=10&language=spa`;
 
             try {
                 const response = await fetch(apiUrl);
@@ -105,11 +117,12 @@
                 const resultsTableBody = document.querySelector('#resultsTable tbody');
                 resultsTableBody.innerHTML = ''; // Clear previous results
 
+                console.log(data); // Log the entire response for debugging
                 data.docs.forEach((book, index) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${index + 1}</td>
-                        <td>${book.title || 'N/A'}</td>
+                        <td><a href="./detail.html?id=${book.key}">${book.title || 'N/A'}</a></td>
                         <td>${book.author_name ? book.author_name.join(', ') : 'N/A'}</td>
                         <td>${book.first_publish_year || 'N/A'}</td>
                     `;

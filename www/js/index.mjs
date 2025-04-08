@@ -1,5 +1,5 @@
 // Import Firebase modules
-import { initializeApp } from "./firebase-app.js";
+import { initializeApp, getApp, getApps} from "./firebase-app.js";
 // Required for side-effects
 import {
   getFirestore,
@@ -22,7 +22,9 @@ const firebaseConfig = {
   };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+
+// const app = initializeApp(firebaseConfig);
 console.log(app);
 const db = getFirestore(app);
 
