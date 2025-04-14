@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <!--
+        Customize this policy to fit your own app's needs. For more guidance, please refer to the docs:
+            https://cordova.apache.org/docs/en/latest/
+        Some notes:
+            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+                * Enable inline JS: add 'unsafe-inline' to default-src
+        -->
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' data: https://ssl.gstatic.com https://openlibrary.org/ https://cdn.jsdelivr.net https://www.gstatic.com https://firebase.googleapis.com 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content: https://covers.openlibrary.org http://covers.openlibrary.org *.archive.org archive.org ;">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <!-- <link rel="stylesheet" href="css/index.css"> -->
+    <!-- Add Bootstrap CSS -->
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+
+    <title>Últimas tendencias</title>
+</head>
+
+<body>
+    <!-- Bootstrap Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="./index.html"><em>Good-Books</em></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="./index.html">Buscar libros</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./mood.html">Libros para mi ánimo</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Últimas tendencias</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Trending Books Section -->
+    <div class="container mt-4">
+        <h2 class="text-center">Últimas tendencias</h2>
+        <div id="trendingBooks" class="row">
+            <div class="d-flex justify-content-center">
+                <h4 style="padding-top: 2m; color: grey;">Cargando...  </h4>
+                <div class="spinner-border" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+        </div>
+    </div>
+
+    <!-- Add Bootstrap JavaScript Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+
+    <script>
+        // Fetch trending books from the API
+        async function fetchTrendingBooks() {
+            const apiUrl = 'https://openlibrary.org/trending/now.json?limit=10';
+            const trendingBooksContainer = document.getElementById('trendingBooks');
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                // Limit to the first 10 books
+                const trendingBooks = data.works.slice(0, 10);
+
+                // Clear the container
+                trendingBooksContainer.innerHTML = '';
+
+                // Render each book
+                trendingBooks.forEach((book, index) => {
+
+
+                    try {
+                        coverUrl = `http://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg?default=false`;
+                    } catch (error) {
+                        console.error('Error fetching cover image:', error);
+                        coverUrl = './img/nocover.png'; // Fallback image
+                    }
+
+                    const bookCard = document.createElement('div');
+                    bookCard.className = 'col-12 mb-3'; // Full width for each book
+
+                    bookCard.innerHTML = `
+                            <div class="card">
+                                <div class="row g-0">
+                                    <div class="col-md-2">
+                                        <img src="${coverUrl}" class="img-fluid rounded-start" onerror="this.onerror=null;this.src='./img/nocover.png'" alt="${book.title || 'Sin portada'}">
+                                    </div>
+                                    <div class="col-md-10">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${book.title || 'N/A'}</h5>
+                                            <p class="card-text">
+                                                <strong>Autor/a:</strong> ${book.author_name ? book.author_name.join(', ') : 'N/A'}<br>
+                                                <strong>Primera publicación:</strong> ${book.first_publish_year || 'N/A'}
+                                            </p>
+                                            <a href="https://openlibrary.org${book.key}" class="btn btn-primary" target="_blank">View Book</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    trendingBooksContainer.appendChild(bookCard);
+                });
+            } catch (error) {
+                console.error('Error fetching trending books:', error);
+            }
+        }
+
+        // Fetch and display trending books on page load
+        fetchTrendingBooks();
+    </script>
+</body>
+
+</html>
