@@ -44,7 +44,7 @@
             <!-- Bootstrap Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Libros</a>
+            <a class="navbar-brand" href="./index.html"><em>Good-Books</em></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -151,7 +151,7 @@
                             <div class="col-md-8">
                                 <div class="card-body">
                                     <h2 class="card-title">${data.title || 'N/A'}</h2>
-                                    <p><strong>Description:</strong> ${data.description?.value || 'No description available.'}</p>
+                                    <p><strong>Description:</strong> ${data.description || 'No description available.'}</p>
                                     <p><strong>Created:</strong> ${data.created?.value || 'N/A'}</p>
                                     <p><strong>Last Modified:</strong> ${data.last_modified?.value || 'N/A'}</p>
                                     <p><strong>Latest Revision:</strong> ${data.latest_revision || 'N/A'}</p>
