@@ -57,35 +57,21 @@
                         <a class="nav-link active" href="#">Libros según mi ánimo</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Libros sugeridos</a>
+                        <a class="nav-link" href="#">Libros sugeridos</span></a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container mt-4" hidden>
         <form class="d-flex" role="search" id="searchForm">
             <input class="form-control me-2" type="search" placeholder="Buscar libros" aria-label="Search" id="searchInput">
             <button class="btn btn-outline-success" type="submit">Buscar</button>
         </form>
     </div>
 
-    <div class="container mt-4">
-        <table class="table table-striped" id="resultsTable">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>First Publish Year</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Results will be dynamically inserted here -->
-            </tbody>
-        </table>
-    </div>
+
 
     <div class="container mt-4">
         <h2 class="text-center">Selecciona tu estado de ánimo</h2>
@@ -95,7 +81,7 @@
     </div>
 
     <div class="container mt-4">
-        <h3 class="text-center">Libros sugeridos</h3>
+        <h3 class="text-center"><span id="span_animo">Libros sugeridos</span></h3>
         <table class="table table-striped" id="moodResultsTable">
             <thead>
                 <tr>
@@ -117,7 +103,7 @@
 
     <script>
 
-        const json_moods = { "feliz": { "description": "Cuando tu mood sea feliz", "keys": [ "OL2965102W", "OL9115066W", "OL35124067W", "OL1322647W", "OL944359W" ] }, "triste": { "description": "Cuando tu mood sea triste", "keys": [ "OL5840870W", "OL274505W", "OL13857431W", "OL267096W", "OL66513W" ] }, "enfadado": { "description": "Cuando tu mood sea enfadado", "keys": [ "OL28185143W", "OL876751W", "OL17115013W", "OL17115013W", "OL7986048W" ] }, "estresado": { "description": "Cuando tu mood sea estresado", "keys": [ "OL20174193W", "OL17640421W", "OL17079692W", "OL5727682W", "OL35181624W" ] }, "enamorado": { "description": "Cuando tu mood sea enamorado", "keys": [ "OL1317211W", "OL23535656W", "OL26382624W", "OL26386290W", "OL17505350W" ] }, "agotado": { "description": "Cuando tu mood sea agotado", "keys": [ "OL34766796W", "OL17333582W", "OL26383624W", "OL25636257W", "OL6905256W" ] } }
+        const json_moods = { "feliz": { "description": "Cuando tu mood sea feliz", "keys": [ "OL2965102W", "OL9115066W", "OL35124067W", "OL1322647W", "OL944359W" ] }, "triste": { "description": "Cuando tu mood sea triste", "keys": [ "OL5840870W", "OL274505W", "OL13857431W", "OL267096W", "OL66513W" ] }, "enfadado": { "description": "Cuando tu mood sea enfadado", "keys": [ "OL28185143W", "OL876751W", "OL17115013W", "OL2709478W", "OL7986048W" ] }, "estresado": { "description": "Cuando tu mood sea estresado", "keys": [ "OL20174193W", "OL17640421W", "OL17079692W", "OL5727682W", "OL35181624W" ] }, "enamorado": { "description": "Cuando tu mood sea enamorado", "keys": [ "OL1317211W", "OL23535656W", "OL26382624W", "OL26386290W", "OL17505350W" ] }, "agotado": { "description": "Cuando tu mood sea agotado", "keys": [ "OL34766796W", "OL17333582W", "OL26383624W", "OL25636257W", "OL6905256W" ] } }
         document.getElementById('searchForm').addEventListener('submit', async function (event) {
             event.preventDefault(); // Prevent form submission
 
@@ -165,8 +151,8 @@
             const moodCard = document.createElement('div');
             moodCard.className = "col-md-4 mb-4";
             moodCard.innerHTML = `
-                <div class="card text-white" style="background-color: ${moodColors[mood]};">
-                    <div class="card-body">
+                <div class="card text-white d-flex justify-content-center align-items-center" style="background-color: ${moodColors[mood]};">
+                    <div class="card-body text-center">
                         <h5 class="card-title">${moodData.description}</h5>
                         <button class="btn btn-light" onclick="fetchBooks('${mood}')">Ver libros</button>
                     </div>
@@ -177,6 +163,8 @@
 
         // Fetch books for a selected mood
         async function fetchBooks(mood) {
+            let span_animo = document.getElementById('span_animo');
+            span_animo.innerHTML = "Libros sugeridos cuando estás " + mood;
             const keys = json_moods[mood].keys;
             moodResultsTableBody.innerHTML = ''; // Clear previous results
 
@@ -192,13 +180,31 @@
                     row.innerHTML = `
                         <td>${i + 1}</td>
                         <td><a href="./detail.html?id=/works/${key}">${data.title || 'N/A'}</a></td>
-                        <td>${data.authors ? data.authors.map(author => author.name).join(', ') : 'N/A'}</td>
+                        <td>
+                            ${data.authors
+                                ? await Promise.all(
+                                    data.authors.map(async (authorObj) => {
+                                        const authorKey = authorObj.author.key;
+                                        const authorApiUrl = `https://openlibrary.org${authorKey}.json`;
+                                        try {
+                                            const response = await fetch(authorApiUrl);
+                                            const authorData = await response.json();
+                                            return authorData.name || 'N/A';
+                                        } catch (error) {
+                                            console.error('Error fetching author data:', error);
+                                            return 'N/A';
+                                        }
+                                    })
+                                ).then((authorNames) => authorNames.join(', '))
+                                : 'N/A'}
+                        </td>
                     `;
                     moodResultsTableBody.appendChild(row);
                 } catch (error) {
                     console.error('Error fetching book data:', error);
                 }
             }
+            
         }
         document.getElementById('searchForm').addEventListener('submit', async function (event) {
             event.preventDefault(); // Prevent form submission
@@ -231,3 +237,4 @@
     </script>
     </body>
 </html>
+``` 
