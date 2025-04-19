@@ -28,7 +28,7 @@
             * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
                 * Enable inline JS: add 'unsafe-inline' to default-src
         -->
-        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: https://ssl.gstatic.com https://openlibrary.org/ https://cdn.jsdelivr.net https://www.gstatic.com https://firebase.googleapis.com 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content: https://covers.openlibrary.org http://covers.openlibrary.org *.archive.org archive.org ;">
+        <meta http-equiv="Content-Security-Policy" content="default-src * 'self' data: 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *; img-src * data: content:;">
         <meta name="format-detection" content="telephone=no">
         <meta name="msapplication-tap-highlight" content="no">
         <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
@@ -76,9 +76,9 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>First Publish Year</th>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Año primera publicación</th>
                 </tr>
             </thead>
             <tbody>
@@ -121,9 +121,9 @@
                             const authorData = await authorResponse.json();
                             authorsDetails += `
                                 <li>
-                                    <strong>Name:</strong> ${authorData.name || 'N/A'}<br>
-                                    <strong>Birth Date:</strong> ${authorData.birth_date || 'N/A'}<br>
-                                    <strong>Death Date:</strong> ${authorData.death_date || 'N/A'}
+                                    <strong>Nombre:</strong> ${authorData.name || 'N/A'}<br>
+                                    <strong>Fecha de nacimiento:</strong> ${authorData.birth_date || 'N/A'}<br>
+                                    <strong>Fecha de fallecimiento:</strong> ${authorData.death_date || 'N/A'}
                                 </li>
                             `;
                         } catch (error) {
@@ -132,11 +132,11 @@
                         }
                     }
                 } else {
-                    authorsDetails = '<li>No authors available.</li>';
+                    authorsDetails = '<li>No hay autores registrados.</li>';
                 }
                 let coverUrl;
                 try {
-                    coverUrl = `http://covers.openlibrary.org/b/id/${data.covers[0]}-M.jpg?default=false`;
+                    coverUrl = `https://covers.openlibrary.org/b/id/${data.covers[0]}-M.jpg?default=false`;
                 } catch (error) {
                     console.error('Error fetching cover image:', error);
                     coverUrl = './img/nocover.png'; // Fallback image
@@ -150,12 +150,12 @@
                             <div class="col-md-8">
                                 <div class="card-body">
                                     <h2 class="card-title">${data.title || 'N/A'}</h2>
-                                    <p><strong>Description:</strong> ${data.description?.value || 'No description available.'}</p>
-                                    <p><strong>Created:</strong> ${data.created?.value || 'N/A'}</p>
-                                    <p><strong>Last Modified:</strong> ${data.last_modified?.value || 'N/A'}</p>
-                                    <p><strong>Latest Revision:</strong> ${data.latest_revision || 'N/A'}</p>
-                                    <p><strong>Subjects:</strong> ${data.subjects ? data.subjects.join(', ') : 'N/A'}</p>
-                                    <p><strong>Authors:</strong></p>
+                                    <p><strong>Descripción:</strong> ${data.description?.value || 'No hay.'}</p>
+                                    <p><strong>Creado:</strong> ${data.created?.value || 'N/A'}</p>
+                                    <p><strong>Última modificación:</strong> ${data.last_modified?.value || 'N/A'}</p>
+                                    <p><strong>Última revisión:</strong> ${data.latest_revision || 'N/A'}</p>
+                                    <p><strong>Temática(s):</strong> ${data.subjects ? data.subjects.join(', ') : 'N/A'}</p>
+                                    <p><strong>Autor(es):</strong></p>
                                     <ul>${authorsDetails}</ul>
                                 </div>
                             </div>

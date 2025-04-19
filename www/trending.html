@@ -129,7 +129,8 @@
                                                 <strong>Autor/a:</strong> ${book.author_name ? book.author_name.join(', ') : 'N/A'}<br>
                                                 <strong>Primera publicación:</strong> ${book.first_publish_year || 'N/A'}
                                             </p>
-                                            <a href="https://openlibrary.org${book.key}" class="btn btn-primary" target="_blank">View Book</a>
+                                            <a href="./detail.html?id=${book.key}" class="btn btn-primary" target="_blank"><b>Ver Libro en Good-Books</b></a>
+                                            <a href="https://openlibrary.org${book.key}" class="btn btn-primary" target="_blank">Ver Libro en OpenLibrary</a>
                                         </div>
                                     </div>
                                 </div>
